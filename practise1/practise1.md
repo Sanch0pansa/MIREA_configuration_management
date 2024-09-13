@@ -4,7 +4,7 @@
 cat /etc/passwd | grep -o '^[^:]*' | sort
 ```
 
-![Picture!](/Pasted%20image%2020240906184957.png "Picture")
+![Picture!](./Pasted%20image%2020240906184957.png "Picture")
 
 # Задание 2
 
@@ -12,7 +12,7 @@ cat /etc/passwd | grep -o '^[^:]*' | sort
 cat /etc/protocols | tail -n 5 | sort -nrk2 | awk '{print $2, $1}'
 ```
 
-![Picture!](/Pasted%20image%2020240906190305.png "Picture")
+![Picture!](./Pasted%20image%2020240906190305.png "Picture")
 
 # Задание 3
 
@@ -46,8 +46,8 @@ echo "+"
 grep -o '\b[a-zA-Z_][a-zA-Z0-9_]*\b' main.cpp | sort | uniq
 ```
 
-![Picture!](/Pasted%20image%2020240906191549.png "Picture")
-![Picture!](/Pasted%20image%2020240906191600.png "Picture")
+![Picture!](./Pasted%20image%2020240906191549.png "Picture")
+![Picture!](./Pasted%20image%2020240906191600.png "Picture")
 
 # Задание 5
 
@@ -88,8 +88,8 @@ for file in "$@"; do
 done
 ```
 
-![Picture!](/Pasted%20image%2020240913124840.png "Picture")
-![Picture!](/Pasted%20image%2020240913125430.png "Picture")
+![Picture!](./Pasted%20image%2020240913124840.png "Picture")
+![Picture!](./Pasted%20image%2020240913125430.png "Picture")
 
 # Задание 7
 
