@@ -7,7 +7,7 @@ cat /etc/passwd | grep -o '^[^:]*' | sort
 ```sh
 cat /etc/protocols | tail -n 5 | sort -nrk2 | awk '{print $2, $1}'
 ```
-![[Pasted image 20240906190305.png]]
+![Pasted image 20240906190305.png]
 # Задание 3
 ```sh
 #!/bin/bash
