@@ -2,6 +2,8 @@ import os
 import tarfile
 from collections import defaultdict
 
+from debugpy.common.timestamp import current
+
 
 class Node:
     def __init__(self, name):
@@ -13,12 +15,14 @@ class Node:
 
     def find_node(self, path):
         current_name = path.split("/")[0]
+        if self.name != current_name:
+            return None
         if self.name == path:
             return self
         for child in self.children:
-            print(child.name, current_name)
-            if child.name == current_name:
-                return child.find_node("/".join(path.split("/")[1:]))
+            res = child.find_node("/".join(path.split("/")[1:]))
+            if res:
+                return res
         return None
 
     def print_tree(self, indent=0):
@@ -44,8 +48,8 @@ with tarfile.open(tar_path, 'r') as tar_ref:
         if "/" in member.name:
             path = "/".join(member.name.split("/")[:-1])
             name = member.name.split("/")[-1]
-            print(path)
-            parent_node = file_tree.find_node("/".join(member.name.split("/")[1:]))
+
+            parent_node = file_tree.find_node(path)
             if parent_node is not None:
                 parent_node.add_child(
                     File(name) if member.isfile() else Directory(name)
