@@ -1,8 +1,6 @@
 import tarfile
 import time
 
-from debugpy.common.timestamp import current
-
 
 class Node:
     def __init__(self, name, parent=None, info=None):
@@ -15,12 +13,17 @@ class Node:
         self.children.append(child)
 
     def find_node(self, path):
+        if path.startswith('/'):
+            return self.get_root().find_node("/".join(path.split("/")[1:]))
+
         current_name = path.split("/")[0]
 
         if path == "":
             return self
 
         if current_name == "..":
+            if self.parent is None:
+                return None
             return self.parent.find_node("/".join(path.split("/")[1:]))
 
         if current_name == ".":
@@ -36,10 +39,18 @@ class Node:
                 return child.find_node("/".join(path.split("/")[1:]))
         return None
 
-    def print_tree(self, indent=0):
-        print('\t' * indent + self.name)
-        for child in self.children:
-            child.print_tree(indent + 1)
+    def print_tree(self, indent=0, lasts=None):
+        if lasts is None:
+            lasts = [True]
+        string = "".join("│  " if not lasts[i] else "   " for i in range(indent))
+        if lasts[-1]:
+            string += "└"
+        else:
+            string += "├"
+        string += self.name + "\n"
+        for i, child in enumerate(self.children):
+            string += child.print_tree(indent + 1, [*lasts, i == len(self.children) - 1])
+        return string
 
     def get_root(self):
         return self.parent.get_root() if self.parent else self
@@ -59,12 +70,9 @@ class File(Node):
 
 
 class Directory(Node):
-    def print_tree(self, indent=0):
-        print('\t' * indent + self.name + "/")
-        for child in self.children:
-            child.print_tree(indent + 1)
 
     def list_children(self, full_format=False):
+        result = ""
         for child in self.children:
             permissions = child.info.get("permissions", "N/A")
             file_type = child.info.get("file_type", "N/A")
@@ -73,13 +81,14 @@ class Directory(Node):
             size = child.info.get("size", "N/A")
             modification_time = child.info.get("modification_time", "N/A")
             name = child.name
-            print(octal_to_symbolic(permissions), end="\t")
-            print(file_type, end="\t")
-            print(user, end="\t")
-            print(group, end="\t")
-            print(size, end="\t")
-            print(modification_time, end="\t")
-            print(name)
+            result += (str(octal_to_symbolic(permissions)) + "\t")
+            result += (str(file_type) + "\t")
+            result += (str(user) + "\t")
+            result += (str(group) + "\t")
+            result += (str(size) + "\t")
+            result += (str(modification_time) + "\t")
+            result += (str(name) + "\n")
+        return result
 
 
 def octal_to_symbolic(octal_str):
@@ -97,59 +106,3 @@ def octal_to_symbolic(octal_str):
     return symbolic_mode
 
 
-def get_file_type_number(member):
-    if member.isdir():
-        return 1  # directory
-    elif member.isfile():
-        return 2  # file
-    elif member.issym():
-        return 3  # symlink
-    elif member.islnk():
-        return 4  # hardlink
-    elif member.ischr():
-        return 5  # character device
-    elif member.isblk():
-        return 6  # block device
-    elif member.isfifo():
-        return 7  # FIFO
-    elif member.issock():
-        return 8  # socket
-    else:
-        return 0  # unknown
-
-file_tree = Directory("system")
-tar_path = "system2.tar"
-with tarfile.open(tar_path, 'r') as tar_ref:
-    for member in tar_ref.getmembers():
-        # Пропускаем корневую директорию, если она есть
-        if "/" in member.name:
-            path = "/".join(member.name.split("/")[1:-1])
-            name = member.name.split("/")[-1]
-
-            mod_time = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(member.mtime))
-            permissions = oct(member.mode)[-3:]  # Права в восьмеричном формате (например, '755')
-
-            info = {
-                'permissions': permissions,
-                'modification_time': mod_time,
-                'user': 'sanchopansa',
-                'size': member.size,
-                'file_type': get_file_type_number(member)
-            }
-
-            parent_node = file_tree.find_node(path)
-            if parent_node is not None:
-                parent_node.add_child(
-                    File(name, parent_node, info) if member.isfile() else Directory(name, parent_node, info),
-                )
-
-file_tree.print_tree()
-cur = file_tree
-while True:
-
-    cd = input(f"[{cur.get_full_path()}] $")
-    if cd == "ls":
-        cur.list_children()
-    res = cur.find_node(cd)
-    if res:
-        cur = res
