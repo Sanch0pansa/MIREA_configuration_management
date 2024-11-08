@@ -6,6 +6,6 @@ SERVERCONF is {
 {
     NGINXCONF => {
         PROXYPASS => 0
-        SERVER => +(SERVERCONF)
+        SERVER => !(SERVERCONF)
     }
 }

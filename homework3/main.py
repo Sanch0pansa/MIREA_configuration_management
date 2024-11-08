@@ -6,7 +6,7 @@ import yaml
 
 name_re = re.compile(r"[A-Z]+")
 number_re = re.compile(r"^[+-]?\d+(\.\d+)?([eE][+-]?\d+)?$")
-constant_usage_re = re.compile(r"\+\([A-Z]+\)")
+constant_usage_re = re.compile(r"!\([A-Z]+\)")
 
 
 def get_dict_from_symbol(parts, i):
@@ -154,7 +154,7 @@ class Dictionary:
 
 class Constant:
     def __init__(self, name):
-        self.name = name.replace("+(", "").replace(")", "")
+        self.name = name.replace("!(", "").replace(")", "")
 
 
 @click.command()
@@ -183,7 +183,7 @@ def convert(source_file, destination_file):
             full_text = full_text.replace("}", " } ")
             full_text = full_text.replace("{", " { ")
             full_text = full_text.replace(")", ") ")
-            full_text = full_text.replace("+(", " +(")
+            full_text = full_text.replace("!(", " !(")
 
             while "  " in full_text:
                 full_text = full_text.replace("  ", " ")
