@@ -35,8 +35,6 @@ class Root:
 
         parts = text.split(" ")
 
-        print(parts)
-
         i = 0
         while i < len(parts):
             part = parts[i]
@@ -55,7 +53,6 @@ class Root:
                     if parts[i + 2] == "{": # Если значение константы начинается с фигурной скобки, то это словарь
                         i += 3
                         dict_text, i = get_dict_from_symbol(parts, i)
-                        print(dict_text, i)
                         self.constants[name] = Dictionary(dict_text, False, self) # Словарь на верхнем уровне
 
                     elif bool(number_re.match(parts[i + 2])): # Если значение константы - это число, то это число :)
