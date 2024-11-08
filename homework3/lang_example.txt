@@ -1,0 +1,11 @@
+SERVERCONF is {
+    HOST => 0
+    PORT => 8080
+}
+
+{
+    NGINXCONF => {
+        PROXYPASS => 0
+        SERVER => +(SERVERCONF)
+    }
+}
